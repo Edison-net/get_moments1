@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get_moments/models/login_models.dart';
+import 'package:get_moments/repository/login_repo.dart';
 import 'package:get_moments/src/components/backgroudcolor.dart';
 import 'package:get_moments/src/components/logo_get_moments.dart';
 import 'package:get_moments/src/components/text_field_get_moments.dart';
 import 'package:get_moments/src/pages/cadastrar/cadastrar.page.dart';
-import 'package:get_moments/src/pages/home/home_page.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import '../../../utils/colors.dart' as colors;
 import '../../components/button_get_moments.dart';
+import '../home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -18,9 +21,39 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool isError = false;
+  var emailController = TextEditingController();
+  var senhaController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    Future<void> _logarPage() async {
+      String email = emailController.text;
+      String senha = senhaController.text;
+      LoginModels loginModels = LoginModels(
+        email: email,
+        password: senha,
+      );
+      var provider = Provider.of<DataLogin>(context, listen: false);
+      await provider.postLogin(loginModels);
+      if (provider.isBack) {
+        if (!mounted) return;
+
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+                builder: (context) => HomePage(
+                      login: email,
+                    )),
+            (route) => false);
+      } else {
+        showDialog(
+            context: context,
+            builder: (context) => const AlertDialog(
+                  title: Text('Atenção'),
+                  content: Text('Verifique seu email ou senha'),
+                ));
+      }
+    }
+
     return Scaffold(
       body: Backgroundcolor(
         child: Center(
@@ -48,6 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: TextFieldGetMoments(
                       isError: isError,
                       hintText: 'Email',
+                      controller: emailController,
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.next,
                       preffixIcon: const Icon(
@@ -64,6 +98,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: TextFieldGetMoments(
                       isError: isError,
+                      controller: senhaController,
                       hintText: 'Senha',
                       obscureText: true,
                       preffixIcon: const Icon(
@@ -107,13 +142,8 @@ class _LoginPageState extends State<LoginPage> {
                             child: ButtonGetMoments(
                               colorBackground: Colors.black54,
                               text: 'Entrar',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const HomePage(),
-                                  ),
-                                );
+                              onPressed: () async {
+                                _logarPage();
                               },
                             ),
                           ),

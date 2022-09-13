@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get_moments/models/cadastro_usuario.dart';
 import 'package:get_moments/src/components/backgroudcolor.dart';
 import 'package:get_moments/src/components/logo_get_moments.dart';
 import 'package:get_moments/src/components/text_field_get_moments.dart';
+import 'package:get_moments/src/pages/login/login_page.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
+import '../../../repository/cadastro_user_repo.dart';
 import '../../../utils/colors.dart' as colors;
 import '../../components/button_get_moments.dart';
 
@@ -16,9 +20,32 @@ class CadastrarPage extends StatefulWidget {
 
 class _CadastrarPageState extends State<CadastrarPage> {
   bool isError = false;
+  var nomeController = TextEditingController();
+  var emailController = TextEditingController();
+  var senhaController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    Future<void> _cadastrarPage() async {
+      String nome = nomeController.text;
+      String email = emailController.text;
+      String senha = senhaController.text;
+      CadastroUsuario cadastroUsuario = CadastroUsuario(
+        name: nome,
+        email: email,
+        password: senha,
+      );
+      var provider = Provider.of<DataClass>(context, listen: false);
+      await provider.postData(cadastroUsuario);
+      if (provider.isBack) {
+        if (!mounted) return;
+
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const LoginPage()),
+            (route) => false);
+      }
+    }
+
     return Scaffold(
       body: Backgroundcolor(
         child: Center(
@@ -45,6 +72,7 @@ class _CadastrarPageState extends State<CadastrarPage> {
                     ),
                     child: TextFieldGetMoments(
                       isError: isError,
+                      controller: nomeController,
                       hintText: 'Nome',
                       textInputAction: TextInputAction.next,
                       preffixIcon: const Icon(
@@ -62,6 +90,7 @@ class _CadastrarPageState extends State<CadastrarPage> {
                     child: TextFieldGetMoments(
                       isError: isError,
                       hintText: 'Email',
+                      controller: emailController,
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.next,
                       preffixIcon: const Icon(
@@ -78,6 +107,7 @@ class _CadastrarPageState extends State<CadastrarPage> {
                     ),
                     child: TextFieldGetMoments(
                       isError: isError,
+                      controller: senhaController,
                       hintText: 'Senha',
                       obscureText: true,
                       preffixIcon: const Icon(
@@ -92,7 +122,9 @@ class _CadastrarPageState extends State<CadastrarPage> {
                       child: ButtonGetMoments(
                         colorBackground: Colors.black54,
                         text: 'Cadastrar',
-                        onPressed: () {},
+                        onPressed: () async {
+                          _cadastrarPage();
+                        },
                       ),
                     ),
                   ),
