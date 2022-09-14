@@ -194,14 +194,10 @@ class _HomePageState extends State<HomePage> {
                                                                   MenuGetMoments(
                                                                 email: widget
                                                                     .login,
-                                                                image: _image!,
+                                                                image: _image,
                                                               ),
                                                             ),
                                                           );
-                                                          if (mounted) {
-                                                            Navigator.pop(
-                                                                context);
-                                                          }
                                                         },
                                                         text: 'Menu',
                                                       ),

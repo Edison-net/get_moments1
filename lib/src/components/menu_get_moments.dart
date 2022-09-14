@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -40,35 +39,36 @@ class MenuGetMoments extends StatelessWidget {
                 width: 75,
                 height: 75,
                 child: Container(
-                    decoration: BoxDecoration(
-                      color: colors.customWhite,
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                    child: image != null
-                        ? Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(40),
+                  decoration: BoxDecoration(
+                    color: colors.customWhite,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: image != null
+                      ? Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(40),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(40),
+                            child: Image.file(
+                              image!,
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(40),
-                              child: Image.file(
-                                image!,
-                                width: 80,
-                                height: 80,
-                                fit: BoxFit.cover,
-                              ),
+                          ),
+                        )
+                      : const CircleAvatar(
+                          radius: 40,
+                          backgroundColor: Colors.white,
+                          child: Center(
+                            child: Icon(
+                              Icons.person,
+                              size: 35,
                             ),
-                          )
-                        : const CircleAvatar(
-                            radius: 40,
-                            backgroundColor: Colors.white,
-                            child: Center(
-                              child: Icon(
-                                Icons.person,
-                                size: 35,
-                              ),
-                            ),
-                          )),
+                          ),
+                        ),
+                ),
               ),
 
               const SizedBox(height: 14),
