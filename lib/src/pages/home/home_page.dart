@@ -1,12 +1,17 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get_moments/models/profissionais_models.dart';
 import 'package:get_moments/repository/profissionais_repo.dart';
+import 'package:get_moments/src/components/button_get_moments.dart';
 import 'package:get_moments/src/components/loading_get_moments.dart';
-import 'package:get_moments/src/components/menu_get_moments.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../utils/colors.dart' as colors;
+import '../../components/menu_get_moments.dart';
 
 class HomePage extends StatefulWidget {
   final String login;
@@ -21,6 +26,29 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<ProfissionaisModels> profissionaisList = <ProfissionaisModels>[];
+  File? _image;
+
+  Future imagem(ImageSource source) async {
+    try {
+      final img = await ImagePicker().pickImage(source: source);
+      if (img == null) return;
+      final imagemSalva = await salvarImage(img.path);
+
+      setState(() {
+        _image = imagemSalva;
+      });
+    } catch (e) {
+      debugPrint('Erro ao carregar imagem $e');
+    }
+  }
+
+  Future<File> salvarImage(String imgPath) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final nome = basename(imgPath);
+    final imgem = File('${directory.path}/$nome');
+
+    return File(imgPath).copy(imgem.path);
+  }
 
   Future<void> loadingProfissionais() async {
     profissionaisList = await getProfissionais();
@@ -76,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   Text(
                                     'Seja bem-vindo\n'
-                                    'Nome usuário',
+                                    '${widget.login.contains('@') ? widget.login.split('@')[0] : widget.login}',
                                     style: GoogleFonts.roboto(
                                       fontSize: 26,
                                       fontWeight: FontWeight.bold,
@@ -85,20 +113,135 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   const SizedBox(width: 40),
                                   GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => MenuGetMoments(
-                                              email: widget.login),
-                                        ),
-                                      );
+                                    onTap: () async {
+                                      await showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                                elevation: 2,
+                                                title: const Text(
+                                                    'Menu de opções'),
+                                                content: const Text(
+                                                    'Escolha uma das opções abaixo'),
+                                                actionsAlignment:
+                                                    MainAxisAlignment.center,
+                                                actions: [
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 20),
+                                                    child: SizedBox(
+                                                      width: 200,
+                                                      height: 50,
+                                                      child: ButtonGetMoments(
+                                                          colorBackground: colors
+                                                              .customBackground,
+                                                          onPressed: () async {
+                                                            await imagem(
+                                                                ImageSource
+                                                                    .gallery);
+                                                            if (mounted) {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            }
+                                                          },
+                                                          text:
+                                                              'Galeria de fotos'),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 20),
+                                                    child: SizedBox(
+                                                      width: 200,
+                                                      height: 50,
+                                                      child: ButtonGetMoments(
+                                                          colorBackground: colors
+                                                              .customBackground,
+                                                          onPressed: () async {
+                                                            await imagem(
+                                                                ImageSource
+                                                                    .camera);
+                                                            if (mounted) {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            }
+                                                          },
+                                                          text: 'Tirar foto'),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 20),
+                                                    child: SizedBox(
+                                                      width: 200,
+                                                      height: 50,
+                                                      child: ButtonGetMoments(
+                                                        colorBackground: colors
+                                                            .customBackground,
+                                                        onPressed: () async {
+                                                          await Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  MenuGetMoments(
+                                                                email: widget
+                                                                    .login,
+                                                                image: _image!,
+                                                              ),
+                                                            ),
+                                                          );
+                                                          if (mounted) {
+                                                            Navigator.pop(
+                                                                context);
+                                                          }
+                                                        },
+                                                        text: 'Menu',
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ));
                                     },
-                                    child: const CircleAvatar(
-                                      radius: 40,
-                                      backgroundImage: NetworkImage(
-                                        'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=202',
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: colors.customWhite,
+                                        borderRadius: BorderRadius.circular(40),
                                       ),
+                                      child: _image != null
+                                          ? Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(40),
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(40),
+                                                child: Image.file(
+                                                  _image!,
+                                                  width: 80,
+                                                  height: 80,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            )
+                                          : const CircleAvatar(
+                                              radius: 40,
+                                              backgroundColor: Colors.white,
+                                              child: Center(
+                                                child: Icon(
+                                                  Icons.person,
+                                                  size: 35,
+                                                ),
+                                              ),
+                                            ),
                                     ),
                                   ),
                                 ],

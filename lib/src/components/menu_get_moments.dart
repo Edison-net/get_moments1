@@ -1,15 +1,20 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get_moments/src/components/backgroudcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../utils/colors.dart' as colors;
 import '../pages/login/login_page.dart';
 
 class MenuGetMoments extends StatelessWidget {
   final String email;
+  final File? image;
   const MenuGetMoments({
     Key? key,
     required this.email,
+    required this.image,
   }) : super(key: key);
 
   @override
@@ -31,20 +36,45 @@ class MenuGetMoments extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               // foto de perfil
-              const SizedBox(
+              SizedBox(
                 width: 75,
                 height: 75,
-                child: CircleAvatar(
-                  radius: 75,
-                  backgroundImage: NetworkImage(
-                    'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=202',
-                  ),
-                ),
+                child: Container(
+                    decoration: BoxDecoration(
+                      color: colors.customWhite,
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    child: image != null
+                        ? Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(40),
+                              child: Image.file(
+                                image!,
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          )
+                        : const CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Colors.white,
+                            child: Center(
+                              child: Icon(
+                                Icons.person,
+                                size: 35,
+                              ),
+                            ),
+                          )),
               ),
+
               const SizedBox(height: 14),
               // nome do usuario
               Text(
-                email,
+                email.contains('@') ? email.split('@')[0] : email,
                 style: GoogleFonts.roboto(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,

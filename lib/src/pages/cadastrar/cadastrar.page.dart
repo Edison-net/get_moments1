@@ -73,6 +73,7 @@ class _CadastrarPageState extends State<CadastrarPage> {
                     child: TextFieldGetMoments(
                       isError: isError,
                       controller: nomeController,
+                      keyboardType: TextInputType.name,
                       hintText: 'Nome',
                       textInputAction: TextInputAction.next,
                       preffixIcon: const Icon(
@@ -108,6 +109,7 @@ class _CadastrarPageState extends State<CadastrarPage> {
                     child: TextFieldGetMoments(
                       isError: isError,
                       controller: senhaController,
+                      keyboardType: TextInputType.number,
                       hintText: 'Senha',
                       obscureText: true,
                       preffixIcon: const Icon(
@@ -123,7 +125,28 @@ class _CadastrarPageState extends State<CadastrarPage> {
                         colorBackground: Colors.black54,
                         text: 'Cadastrar',
                         onPressed: () async {
-                          _cadastrarPage();
+                          if (nomeController.text.isEmpty ||
+                              emailController.text.isEmpty ||
+                              senhaController.text.isEmpty) {
+                            showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                      title: const Text('Atenção'),
+                                      content: const Text(
+                                          'Preencha todos os campos'),
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                            child: const Text('Ok'))
+                                      ],
+                                    ));
+                            setState(() {
+                              isError = true;
+                            });
+                          } else {
+                            await _cadastrarPage();
+                          }
                         },
                       ),
                     ),

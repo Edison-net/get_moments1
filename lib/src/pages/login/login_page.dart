@@ -49,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
             context: context,
             builder: (context) => const AlertDialog(
                   title: Text('Atenção'),
-                  content: Text('Verifique seu email ou senha'),
+                  content: Text('E-mail ou Senha Inválidos'),
                 ));
       }
     }
@@ -100,6 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                       isError: isError,
                       controller: senhaController,
                       hintText: 'Senha',
+                      keyboardType: TextInputType.number,
                       obscureText: true,
                       preffixIcon: const Icon(
                         Icons.lock_outlined,
