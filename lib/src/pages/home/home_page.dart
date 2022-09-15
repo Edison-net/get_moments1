@@ -26,6 +26,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<ProfissionaisModels> profissionaisList = <ProfissionaisModels>[];
+
   File? _image;
 
   Future imagem(ImageSource source) async {
